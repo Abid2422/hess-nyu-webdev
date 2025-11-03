@@ -11,7 +11,7 @@ export default function App() {
   return (
     <div className="app">
       <Navbar />
-      <main className="container">
+      <main style={{ margin: 0, padding: 0 }}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/our-team" element={<OurTeam />} />
