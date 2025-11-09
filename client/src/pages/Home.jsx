@@ -1,3 +1,5 @@
+import { useMemo, useState } from 'react';
+
 const palette = {
   background: '#0F172A',
   surface: 'rgba(255,255,255,0.03)',
@@ -61,24 +63,57 @@ const listBullet = {
   lineHeight: 1.6,
 };
 
-const upcomingEvents = [
+const events = [
   {
+    id: 'welcome-mixer',
+    status: 'upcoming',
     title: 'HESS Welcome Mixer',
     date: 'September 12 · 6:00 PM',
     location: 'NYU MakerSpace (Brooklyn)',
     description: 'Kick off the semester, meet the board, and find collaborators bridging CAS ↔ Tandon.',
+    details: 'We’ll have quick lightning intros, breakout idea pitches, and a resource wall to match you with ongoing projects.',
   },
   {
+    id: 'research-to-reel',
+    status: 'upcoming',
     title: 'Research to Reel Workshop',
     date: 'September 20 · 5:30 PM',
     location: '25 West 4th St · 5th Floor',
     description: 'Learn how HESSPLORE turns dense papers into digestible stories and short-form videos.',
+    details: 'Hands-on editing session—bring a research abstract or we’ll match you with one. We cover storytelling frameworks and on-camera tips.',
   },
   {
+    id: 'quantum-finance',
+    status: 'upcoming',
     title: 'Faculty Fireside: Quantum x Finance',
     date: 'October 3 · 7:00 PM',
     location: 'Virtual (Zoom link sent after RSVP)',
     description: 'Hear from NYU researchers applying quantum computing to real-world markets.',
+    details: 'Panel with professors from Courant and Stern. Includes live Q&A and a breakout room for project ideation.',
+  },
+  {
+    id: 'ai-ethics-panel',
+    status: 'past',
+    title: 'AI Ethics + Policy Salon',
+    date: 'April 28 · 6:30 PM',
+    location: 'NYU Law · Furman Hall',
+    description: 'Roundtable with Center for Data Science and NYU Law exploring algorithmic justice.',
+  },
+  {
+    id: 'prototype-night',
+    status: 'past',
+    title: 'Prototype Night: Sensors & Cities',
+    date: 'March 19 · 7:00 PM',
+    location: 'Tandon MakerSpace',
+    description: 'Student teams demoed urban tech prototypes with instant feedback from industry mentors.',
+  },
+  {
+    id: 'scholarsync-beta',
+    status: 'past',
+    title: 'ScholarSync Beta Lab',
+    date: 'February 8 · 5:00 PM',
+    location: '25 West 4th St · Media Studio',
+    description: 'Soft launch of the ScholarSync tool with guided testing and storyboard sessions.',
   },
 ];
 
@@ -98,6 +133,72 @@ const spotlights = [
 ];
 
 export default function Home() {
+  const [selectedEventId, setSelectedEventId] = useState(null);
+  const [isPastModalOpen, setIsPastModalOpen] = useState(false);
+
+  const upcomingEvents = useMemo(
+    () => events.filter((event) => event.status === 'upcoming'),
+    [],
+  );
+
+  const pastEvents = useMemo(
+    () => events.filter((event) => event.status === 'past'),
+    [],
+  );
+
+  const selectedEvent = useMemo(
+    () => events.find((event) => event.id === selectedEventId) || null,
+    [selectedEventId],
+  );
+
+  const closeEventModal = () => setSelectedEventId(null);
+  const closePastModal = () => setIsPastModalOpen(false);
+
+  const modalOverlayStyle = {
+    position: 'fixed',
+    inset: 0,
+    backgroundColor: 'rgba(11, 15, 25, 0.78)',
+    backdropFilter: 'blur(12px)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '24px',
+    zIndex: 100,
+  };
+
+  const modalCardStyleLarge = {
+    background: 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(15,23,42,0.95) 100%)',
+    borderRadius: '20px',
+    border: `1px solid ${palette.border}`,
+    boxShadow: '0 30px 60px rgba(10,12,24,0.6)',
+  padding: '48px 32px 32px',
+    maxWidth: '640px',
+  maxHeight: '80vh',
+    width: '100%',
+    color: palette.text,
+  overflowY: 'auto',
+  position: 'relative',
+  };
+
+  const modalCardStyleSmall = {
+    ...modalCardStyleLarge,
+  maxWidth: '480px',
+  };
+
+  const closeButtonStyle = {
+    position: 'absolute',
+    top: '18px',
+    right: '18px',
+    background: 'transparent',
+    border: `1px solid ${palette.border}`,
+    color: palette.muted,
+    borderRadius: '999px',
+    padding: '6px 12px',
+    fontWeight: 600,
+    cursor: 'pointer',
+    fontFamily: heading.fontFamily,
+  };
+
   return (
     <div style={{ backgroundColor: palette.background, color: palette.text, minHeight: '100vh' }}>
       {/* Hero Section */}
@@ -221,13 +322,47 @@ export default function Home() {
         <div style={sectionWrapper}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', marginBottom: '28px' }}>
             <h2 style={{ ...heading, fontSize: '2.2rem', color: palette.text }}>Upcoming events</h2>
-            <a href="https://www.instagram.com/hess.nyu/" style={{ color: palette.muted, fontWeight: 600, textDecoration: 'none' }}>
-              Follow @hess.nyu for full calendar →
-            </a>
+            <button
+              type="button"
+              onClick={() => setIsPastModalOpen(true)}
+              style={{
+                background: 'rgba(148,163,184,0.08)',
+                border: `1px solid ${palette.border}`,
+                color: palette.text,
+                fontWeight: 600,
+                fontFamily: heading.fontFamily,
+                padding: '8px 16px',
+                borderRadius: '999px',
+                cursor: 'pointer',
+                letterSpacing: '0.02em',
+                transition: 'background 0.2s ease, transform 0.2s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(148,163,184,0.15)';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(148,163,184,0.08)';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+            >
+              Past events
+            </button>
           </div>
           <div style={{ display: 'grid', gap: '20px', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
             {upcomingEvents.map((event) => (
-              <article key={event.title} style={cardStyle}>
+              <article
+                key={event.id}
+                style={{ ...cardStyle, cursor: 'pointer', position: 'relative', overflow: 'hidden' }}
+                onClick={() => setSelectedEventId(event.id)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    setSelectedEventId(event.id);
+                  }
+                }}
+              >
                 <p style={{ ...paragraph, color: palette.muted, fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', fontSize: '0.88rem' }}>{event.date}</p>
                 <h3 style={{ ...heading, fontSize: '1.5rem', margin: '10px 0 12px', color: palette.text }}>{event.title}</h3>
                 <p style={{ ...paragraph, color: palette.text, opacity: 0.88, marginBottom: '10px' }}>{event.description}</p>
@@ -235,6 +370,9 @@ export default function Home() {
               </article>
             ))}
           </div>
+          <p style={{ ...paragraph, color: palette.muted, marginTop: '20px' }}>
+            Want more? Follow <a href="https://www.instagram.com/hess.nyu/" style={{ color: palette.text, textDecoration: 'underline', fontWeight: 600 }}>@hess.nyu</a> for live updates.
+          </p>
         </div>
       </section>
 
@@ -287,6 +425,86 @@ export default function Home() {
           </p>
         </div>
       </footer>
+      {selectedEvent && (
+        <div
+          style={modalOverlayStyle}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={`event-modal-${selectedEvent.id}`}
+          onClick={closeEventModal}
+        >
+          <div
+            style={modalCardStyleLarge}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button type="button" onClick={closeEventModal} style={closeButtonStyle}>
+              Close
+            </button>
+            <p style={{ ...paragraph, color: palette.muted, letterSpacing: '0.06em', textTransform: 'uppercase', fontSize: '0.85rem', marginBottom: '12px' }}>
+              {selectedEvent.date}
+            </p>
+            <h3 id={`event-modal-${selectedEvent.id}`} style={{ ...heading, fontSize: '2rem', marginBottom: '16px' }}>
+              {selectedEvent.title}
+            </h3>
+            <p style={{ ...paragraph, color: palette.muted, marginBottom: '20px', display: 'flex', gap: '8px', alignItems: 'center', fontSize: '1rem' }}>
+              <span role="img" aria-hidden="true">📍</span>
+              {selectedEvent.location}
+            </p>
+            <p style={{ ...paragraph, marginBottom: '18px', opacity: 0.95 }}>
+              {selectedEvent.description}
+            </p>
+            {selectedEvent.details && (
+              <p style={{ ...paragraph, color: palette.muted }}>
+                {selectedEvent.details}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+      {isPastModalOpen && (
+        <div
+          style={modalOverlayStyle}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="past-events-heading"
+          onClick={closePastModal}
+        >
+          <div
+            style={modalCardStyleSmall}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button type="button" onClick={closePastModal} style={closeButtonStyle}>
+              Close
+            </button>
+            <h3 id="past-events-heading" style={{ ...heading, fontSize: '1.8rem', marginBottom: '16px' }}>
+              Past events
+            </h3>
+            <p style={{ ...paragraph, color: palette.muted, marginBottom: '18px' }}>
+              A snapshot of recent gatherings—ask the board for slide decks or recordings.
+            </p>
+            <div style={{ maxHeight: '60vh', overflowY: 'auto', paddingRight: '4px' }}>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '16px' }}>
+                {pastEvents.map((event) => (
+                  <li key={event.id} style={{ padding: '16px 18px', borderRadius: '14px', backgroundColor: 'rgba(148,163,184,0.06)', border: `1px solid ${palette.border}` }}>
+                    <p style={{ ...paragraph, color: palette.muted, fontSize: '0.88rem', marginBottom: '6px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                      {event.date}
+                    </p>
+                    <p style={{ ...paragraph, fontWeight: 700, marginBottom: '6px' }}>
+                      {event.title}
+                    </p>
+                    <p style={{ ...paragraph, color: palette.muted, marginBottom: '6px' }}>
+                      {event.description}
+                    </p>
+                    <p style={{ ...paragraph, color: palette.muted, fontSize: '0.9rem' }}>
+                      📍 {event.location}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
