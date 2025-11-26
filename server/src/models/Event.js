@@ -15,6 +15,10 @@ const eventSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    details: {
+      type: String,
+      trim: true,
+    },
     status: {
       type: String,
       enum: ['upcoming', 'past'],
@@ -28,6 +32,11 @@ const eventSchema = new mongoose.Schema(
     },
     endAt: {
       type: Date,
+    },
+    displayDate: {
+      type: String,
+      required: true,
+      trim: true,
     },
     location: {
       type: String,

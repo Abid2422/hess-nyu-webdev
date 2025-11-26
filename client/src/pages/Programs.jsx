@@ -1,3 +1,6 @@
+import { useEffect, useState } from 'react';
+import { apiRequest } from '../api/client.js';
+
 const palette = {
   background: '#0F172A',
   surface: 'rgba(255,255,255,0.03)',
@@ -28,38 +31,37 @@ const cardStyle = {
   gap: '16px',
 };
 
-const programs = [
-  {
-    title: 'ScholarSync Studio',
-    tagline: 'From journal article to story in under 48 hours.',
-    description: 'Our media lab where storytellers and engineers translate dense research into short videos, scripts, and social spotlights. Teams pair with NYU labs to publish every week.',
-    cadence: 'Meets bi-weekly · Wednesdays 6–8 PM · 25 W 4th St Media Studio',
-    callout: 'Looking for video editors, copywriters, and on-camera hosts.',
-  },
-  {
-    title: 'Pathways Program',
-    tagline: 'Helping STEM students land research and industry roles.',
-    description: 'Workshops, alumni mentorship, and curated internship drops tailored for CAS ↔ Tandon students. Includes resume clinics, mock interviews, and introductions to faculty labs.',
-    cadence: 'Monthly cohort sessions + 1:1 mentor check-ins',
-    callout: 'Applications open each semester; priority for active HESS members.',
-  },
-  {
-    title: 'Maker Nights',
-    tagline: 'Prototype sprints linking hardware + software.',
-    description: 'Hands-on evenings in the MakerSpace for sensors, robotics, and rapid prototyping. Industry mentors rotate through to offer design reviews and technical feedback.',
-    cadence: 'Fridays 7–10 PM · Tandon MakerSpace',
-    callout: 'BYO project or join an existing sprint team.',
-  },
-  {
-    title: 'Faculty Firesides',
-    tagline: 'Small-group conversations with NYU researchers.',
-    description: 'Curated salon-style gatherings featuring emerging science across NYU. Guests from Courant, Grossman, and Stern unpack their latest findings with plenty of time for Q&A.',
-    cadence: 'Twice per month · Hybrid (in-person + Zoom)',
-    callout: 'RSVPs required; spots released to the mailing list first.',
-  },
-];
-
 export default function Programs() {
+  const [programs, setPrograms] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadPrograms() {
+      setLoading(true);
+      setError('');
+      try {
+        const data = await apiRequest('/programs');
+        if (isMounted) {
+          setPrograms(data);
+        }
+      } catch (err) {
+        if (isMounted) {
+          setError(err.message || 'Unable to load programs');
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    }
+    loadPrograms();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   return (
     <div style={{ backgroundColor: palette.background, color: palette.text, minHeight: '100vh', padding: '96px 0 104px' }}>
       <div style={{ maxWidth: '1080px', margin: '0 auto', padding: '0 24px', display: 'grid', gap: '48px' }}>
@@ -75,29 +77,48 @@ export default function Programs() {
           </p>
         </header>
 
-        <section style={{ display: 'grid', gap: '28px', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
-          {programs.map((program) => (
-            <article key={program.title} style={cardStyle}>
-              <div>
-                <h2 style={{ ...heading, fontSize: '1.8rem', marginBottom: '6px' }}>{program.title}</h2>
-                <p style={{ ...paragraph, color: palette.muted, fontStyle: 'italic' }}>{program.tagline}</p>
-              </div>
-              <p style={{ ...paragraph, opacity: 0.92 }}>
-                {program.description}
+        {loading ? (
+          <p style={{ ...paragraph, color: palette.muted, textAlign: 'center' }}>Loading programs…</p>
+        ) : error ? (
+          <p style={{ ...paragraph, color: '#fca5a5', textAlign: 'center' }}>{error}</p>
+        ) : (
+          <section style={{ display: 'grid', gap: '28px', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
+            {programs.map((program) => (
+              <article key={program._id} style={cardStyle}>
+                <div>
+                  <h2 style={{ ...heading, fontSize: '1.8rem', marginBottom: '6px' }}>{program.title}</h2>
+                  {program.shortDescription && (
+                    <p style={{ ...paragraph, color: palette.muted, fontStyle: 'italic' }}>{program.shortDescription}</p>
+                  )}
+                </div>
+                {program.longDescription && (
+                  <p style={{ ...paragraph, opacity: 0.92 }}>
+                    {program.longDescription}
+                  </p>
+                )}
+                {program.meetingFrequency && (
+                  <p style={{ ...paragraph, color: palette.muted, fontSize: '0.95rem' }}>
+                    📅 {program.meetingFrequency}
+                  </p>
+                )}
+                {program.ctaLabel && program.ctaUrl && (
+                  <a href={program.ctaUrl} style={{ ...paragraph, color: palette.accent, fontWeight: 600 }}>
+                    {program.ctaLabel}
+                  </a>
+                )}
+              </article>
+            ))}
+            {programs.length === 0 && (
+              <p style={{ gridColumn: '1/-1', ...paragraph, color: palette.muted, textAlign: 'center' }}>
+                Sit tight—fresh programs are being finalized and will appear here soon.
               </p>
-              <p style={{ ...paragraph, color: palette.muted, fontSize: '0.95rem' }}>
-                📅 {program.cadence}
-              </p>
-              <p style={{ ...paragraph, color: palette.accent, fontWeight: 600 }}>
-                {program.callout}
-              </p>
-            </article>
-          ))}
-        </section>
+            )}
+          </section>
+        )}
 
         <footer style={{ textAlign: 'center', display: 'grid', gap: '10px' }}>
           <p style={{ ...paragraph, color: palette.muted }}>
-            Curious where you fit? Email <a href="mailto:programs@hess-nyu.org" style={{ color: palette.text, textDecoration: 'underline', fontWeight: 600 }}>programs@hess-nyu.org</a> and we’ll match you with the right track.
+            Curious where you fit? Email <a href="mailto:nyuhemmes@gmail.com" style={{ color: palette.text, textDecoration: 'underline', fontWeight: 600 }}>nyuhemmes@gmail.com</a> and we’ll match you with the right track.
           </p>
         </footer>
       </div>

@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { apiRequest } from '../api/client.js';
 
 const palette = {
   background: '#0F172A',
@@ -63,92 +64,71 @@ const listBullet = {
   lineHeight: 1.6,
 };
 
-const events = [
-  {
-    id: 'welcome-mixer',
-    status: 'upcoming',
-    title: 'HESS Welcome Mixer',
-    date: 'September 12 · 6:00 PM',
-    location: 'NYU MakerSpace (Brooklyn)',
-    description: 'Kick off the semester, meet the board, and find collaborators bridging CAS ↔ Tandon.',
-    details: 'We’ll have quick lightning intros, breakout idea pitches, and a resource wall to match you with ongoing projects.',
-  },
-  {
-    id: 'research-to-reel',
-    status: 'upcoming',
-    title: 'Research to Reel Workshop',
-    date: 'September 20 · 5:30 PM',
-    location: '25 West 4th St · 5th Floor',
-    description: 'Learn how HESSPLORE turns dense papers into digestible stories and short-form videos.',
-    details: 'Hands-on editing session—bring a research abstract or we’ll match you with one. We cover storytelling frameworks and on-camera tips.',
-  },
-  {
-    id: 'quantum-finance',
-    status: 'upcoming',
-    title: 'Faculty Fireside: Quantum x Finance',
-    date: 'October 3 · 7:00 PM',
-    location: 'Virtual (Zoom link sent after RSVP)',
-    description: 'Hear from NYU researchers applying quantum computing to real-world markets.',
-    details: 'Panel with professors from Courant and Stern. Includes live Q&A and a breakout room for project ideation.',
-  },
-  {
-    id: 'ai-ethics-panel',
-    status: 'past',
-    title: 'AI Ethics + Policy Salon',
-    date: 'April 28 · 6:30 PM',
-    location: 'NYU Law · Furman Hall',
-    description: 'Roundtable with Center for Data Science and NYU Law exploring algorithmic justice.',
-  },
-  {
-    id: 'prototype-night',
-    status: 'past',
-    title: 'Prototype Night: Sensors & Cities',
-    date: 'March 19 · 7:00 PM',
-    location: 'Tandon MakerSpace',
-    description: 'Student teams demoed urban tech prototypes with instant feedback from industry mentors.',
-  },
-  {
-    id: 'scholarsync-beta',
-    status: 'past',
-    title: 'ScholarSync Beta Lab',
-    date: 'February 8 · 5:00 PM',
-    location: '25 West 4th St · Media Studio',
-    description: 'Soft launch of the ScholarSync tool with guided testing and storyboard sessions.',
-  },
-];
-
 const spotlights = [
   {
-    name: 'Anjali R. · CAS Neuroscience',
-    highlight: 'Summer research on neuroplasticity featured on @hess.nyu',
+    name: 'Daniel Tkach · Co-Founder, For Future Lungs',
+    highlight: 'Based in New York · BS/DDS NYU · Leading respiratory innovation to empower patient communities.',
   },
   {
-    name: 'Leo C. · Tandon Mechatronics',
-    highlight: 'Prototype robotics lab project covered in HESSPLORE Ep. 14',
+    name: 'Idriss Attard · CAS College Leader',
+    highlight: 'BS NYU · Presidential Honors Scholar · Ambassador, Whats Good Doctor · Research at Columbia University.',
   },
   {
-    name: 'Fatima A. · CAS Chemistry',
-    highlight: 'Goldwater Scholar interview on turning lab work into policy impact',
+    name: 'Deven Huang · Founder, NYU Undergraduate Research Journal',
+    highlight: 'BA NYU · CAS College Leader · Presidential Honors Scholar · Research at NYU Langone.',
+  },
+  {
+    name: 'Marvellous Nwanna · CAS Merit Scholar',
+    highlight: 'BS NYU · University of Toronto SHPEP · Medical Assistant, NYU Langone · Research at Albert Einstein College of Medicine and Columbia University · Academic Achievement Program Scholar, NYU.',
   },
 ];
 
 export default function Home() {
   const [selectedEventId, setSelectedEventId] = useState(null);
   const [isPastModalOpen, setIsPastModalOpen] = useState(false);
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const [pastEvents, setPastEvents] = useState([]);
+  const [eventsLoading, setEventsLoading] = useState(true);
+  const [eventsError, setEventsError] = useState('');
 
-  const upcomingEvents = useMemo(
-    () => events.filter((event) => event.status === 'upcoming'),
-    [],
-  );
+  useEffect(() => {
+    let isMounted = true;
+    async function loadEvents() {
+      setEventsLoading(true);
+      setEventsError('');
+      try {
+        const [upcoming, past] = await Promise.all([
+          apiRequest('/events?status=upcoming'),
+          apiRequest('/events?status=past'),
+        ]);
+        if (isMounted) {
+          setUpcomingEvents(upcoming);
+          setPastEvents(past);
+        }
+      } catch (error) {
+        if (isMounted) {
+          setEventsError(error.message || 'Unable to load events');
+        }
+      } finally {
+        if (isMounted) {
+          setEventsLoading(false);
+        }
+      }
+    }
+    loadEvents();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
-  const pastEvents = useMemo(
-    () => events.filter((event) => event.status === 'past'),
-    [],
+  const allEvents = useMemo(
+    () => [...upcomingEvents, ...pastEvents],
+    [upcomingEvents, pastEvents],
   );
 
   const selectedEvent = useMemo(
-    () => events.find((event) => event.id === selectedEventId) || null,
-    [selectedEventId],
+    () => allEvents.find((event) => event._id === selectedEventId) || null,
+    [selectedEventId, allEvents],
   );
 
   const closeEventModal = () => setSelectedEventId(null);
@@ -322,53 +302,62 @@ export default function Home() {
         <div style={sectionWrapper}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', marginBottom: '28px' }}>
             <h2 style={{ ...heading, fontSize: '2.2rem', color: palette.text }}>Upcoming events</h2>
-            <button
-              type="button"
-              onClick={() => setIsPastModalOpen(true)}
-              style={{
-                background: 'rgba(148,163,184,0.08)',
-                border: `1px solid ${palette.border}`,
-                color: palette.text,
-                fontWeight: 600,
-                fontFamily: heading.fontFamily,
-                padding: '8px 16px',
-                borderRadius: '999px',
-                cursor: 'pointer',
-                letterSpacing: '0.02em',
-                transition: 'background 0.2s ease, transform 0.2s ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(148,163,184,0.15)';
-                e.currentTarget.style.transform = 'translateY(-2px)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(148,163,184,0.08)';
-                e.currentTarget.style.transform = 'translateY(0)';
-              }}
-            >
-              Past events
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              {eventsLoading && <p style={{ ...paragraph, color: palette.muted, fontSize: '0.9rem' }}>Loading…</p>}
+              {eventsError && <p style={{ ...paragraph, color: '#fca5a5', fontSize: '0.9rem' }}>{eventsError}</p>}
+              <button
+                type="button"
+                onClick={() => setIsPastModalOpen(true)}
+                style={{
+                  background: 'rgba(148,163,184,0.08)',
+                  border: `1px solid ${palette.border}`,
+                  color: palette.text,
+                  fontWeight: 600,
+                  fontFamily: heading.fontFamily,
+                  padding: '8px 16px',
+                  borderRadius: '999px',
+                  cursor: 'pointer',
+                  letterSpacing: '0.02em',
+                  transition: 'background 0.2s ease, transform 0.2s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(148,163,184,0.15)';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(148,163,184,0.08)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                Past events
+              </button>
+            </div>
           </div>
           <div style={{ display: 'grid', gap: '20px', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
             {upcomingEvents.map((event) => (
               <article
-                key={event.id}
+                key={event._id}
                 style={{ ...cardStyle, cursor: 'pointer', position: 'relative', overflow: 'hidden' }}
-                onClick={() => setSelectedEventId(event.id)}
+                onClick={() => setSelectedEventId(event._id)}
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
-                    setSelectedEventId(event.id);
+                    setSelectedEventId(event._id);
                   }
                 }}
               >
-                <p style={{ ...paragraph, color: palette.muted, fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', fontSize: '0.88rem' }}>{event.date}</p>
+                <p style={{ ...paragraph, color: palette.muted, fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', fontSize: '0.88rem' }}>{event.displayDate}</p>
                 <h3 style={{ ...heading, fontSize: '1.5rem', margin: '10px 0 12px', color: palette.text }}>{event.title}</h3>
                 <p style={{ ...paragraph, color: palette.text, opacity: 0.88, marginBottom: '10px' }}>{event.description}</p>
                 <p style={{ ...paragraph, color: palette.muted, fontSize: '0.95rem' }}>📍 {event.location}</p>
               </article>
             ))}
+            {!eventsLoading && upcomingEvents.length === 0 && !eventsError && (
+              <div style={{ ...cardStyle }}>
+                <p style={{ ...paragraph, color: palette.muted }}>Stay tuned—new events are rolling out soon.</p>
+              </div>
+            )}
           </div>
           <p style={{ ...paragraph, color: palette.muted, marginTop: '20px' }}>
             Want more? Follow <a href="https://www.instagram.com/hess.nyu/" style={{ color: palette.text, textDecoration: 'underline', fontWeight: 600 }}>@hess.nyu</a> for live updates.
@@ -411,14 +400,14 @@ export default function Home() {
             <a href="https://forms.gle/8aseSignUp" style={buttonStyle}>Sign up to join</a>
             <a href="mailto:contact@hess-nyu.org" style={{ ...secondaryLink, marginLeft: 0 }}>Email the board →</a>
           </div>
-        </div>
-      </section>
+      </div>
+    </section>
 
       {/* Footer-like info */}
       <footer style={{ borderTop: `1px solid ${palette.border}`, padding: '36px 0', backgroundColor: '#0B0F19' }}>
         <div style={{ ...sectionWrapper, textAlign: 'center' }}>
           <p style={{ ...paragraph, color: palette.muted, marginBottom: '12px' }}>
-            Find us at 25 W 4th St, 5th Floor · contact@hess-nyu.org · Instagram <a href="https://www.instagram.com/hess.nyu/" style={{ color: palette.text, textDecoration: 'underline', fontWeight: 600 }}>@hess.nyu</a>
+            Find us at 25 W 4th St, 5th Floor · <a href="mailto:nyuhemmes@gmail.com" style={{ color: palette.text, textDecoration: 'underline' }}>nyuhemmes@gmail.com</a> · Instagram <a href="https://www.instagram.com/hess.nyu/" style={{ color: palette.text, textDecoration: 'underline', fontWeight: 600 }}>@hess.nyu</a>
           </p>
           <p style={{ ...paragraph, fontSize: '0.9rem', color: palette.muted }}>
             HESS is where NYU’s engineers and scientists connect, communicate, and collaborate across CAS ↔ Tandon.
@@ -430,7 +419,7 @@ export default function Home() {
           style={modalOverlayStyle}
           role="dialog"
           aria-modal="true"
-          aria-labelledby={`event-modal-${selectedEvent.id}`}
+          aria-labelledby={`event-modal-${selectedEvent._id}`}
           onClick={closeEventModal}
         >
           <div
@@ -441,9 +430,9 @@ export default function Home() {
               Close
             </button>
             <p style={{ ...paragraph, color: palette.muted, letterSpacing: '0.06em', textTransform: 'uppercase', fontSize: '0.85rem', marginBottom: '12px' }}>
-              {selectedEvent.date}
+              {selectedEvent.displayDate}
             </p>
-            <h3 id={`event-modal-${selectedEvent.id}`} style={{ ...heading, fontSize: '2rem', marginBottom: '16px' }}>
+            <h3 id={`event-modal-${selectedEvent._id}`} style={{ ...heading, fontSize: '2rem', marginBottom: '16px' }}>
               {selectedEvent.title}
             </h3>
             <p style={{ ...paragraph, color: palette.muted, marginBottom: '20px', display: 'flex', gap: '8px', alignItems: 'center', fontSize: '1rem' }}>
@@ -485,9 +474,9 @@ export default function Home() {
             <div style={{ maxHeight: '60vh', overflowY: 'auto', paddingRight: '4px' }}>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '16px' }}>
                 {pastEvents.map((event) => (
-                  <li key={event.id} style={{ padding: '16px 18px', borderRadius: '14px', backgroundColor: 'rgba(148,163,184,0.06)', border: `1px solid ${palette.border}` }}>
+                  <li key={event._id} style={{ padding: '16px 18px', borderRadius: '14px', backgroundColor: 'rgba(148,163,184,0.06)', border: `1px solid ${palette.border}` }}>
                     <p style={{ ...paragraph, color: palette.muted, fontSize: '0.88rem', marginBottom: '6px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-                      {event.date}
+                      {event.displayDate}
                     </p>
                     <p style={{ ...paragraph, fontWeight: 700, marginBottom: '6px' }}>
                       {event.title}
@@ -500,6 +489,11 @@ export default function Home() {
                     </p>
                   </li>
                 ))}
+                {!eventsLoading && pastEvents.length === 0 && !eventsError && (
+                  <li style={{ padding: '16px 18px', borderRadius: '14px', backgroundColor: 'rgba(148,163,184,0.06)', border: `1px solid ${palette.border}` }}>
+                    <p style={{ ...paragraph, color: palette.muted }}>Past events will appear here once we archive them.</p>
+                  </li>
+                )}
               </ul>
             </div>
           </div>

@@ -4,6 +4,8 @@ import cors from 'cors';
 import morgan from 'morgan';
 import { connectToDatabase } from './mongo.js';
 import { router as apiRouter } from './routes/index.js';
+import { ensureAdminUser } from './utils/ensureAdminUser.js';
+import { purgeExpiredSessions } from './utils/sessionStore.js';
 
 dotenv.config();
 
@@ -23,10 +25,14 @@ const port = process.env.PORT || 4000;
 
 connectToDatabase()
   .then(() => {
+    return ensureAdminUser();
+  })
+  .then(() => {
     app.listen(port, () => {
       // eslint-disable-next-line no-console
       console.log(`Server listening on http://localhost:${port}`);
     });
+    setInterval(purgeExpiredSessions, 10 * 60 * 1000);
   })
   .catch((error) => {
     // eslint-disable-next-line no-console

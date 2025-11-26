@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <defs>
+    <linearGradient id="eliasGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0EA5E9"/>
+      <stop offset="100%" stop-color="#2563EB"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="400" rx="48" fill="url(#eliasGradient)"/>
+  <text x="200" y="210" text-anchor="middle" font-family="Montserrat, sans-serif" font-size="140" fill="#F8FAFC" font-weight="700">ET</text>
+  <text x="200" y="300" text-anchor="middle" font-family="Montserrat, sans-serif" font-size="36" fill="#E2E8F0" opacity="0.75">TECH</text>
+</svg>
+

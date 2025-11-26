@@ -21,41 +21,107 @@ const paragraph = {
 const cardStyle = {
   backgroundColor: palette.surface,
   border: `1px solid ${palette.border}`,
-  borderRadius: '18px',
-  padding: '28px',
-  boxShadow: '0 18px 36px rgba(9,13,22,0.45)',
+  borderRadius: '24px',
+  padding: '24px',
+  boxShadow: '0 24px 48px rgba(9,13,22,0.45)',
   display: 'grid',
-  gap: '14px',
+  gap: '18px',
+  textAlign: 'center',
+};
+
+const photoWrapper = {
+  position: 'relative',
+  width: '220px',
+  height: '220px',
+  margin: '0 auto',
+  borderRadius: '20px',
+  overflow: 'hidden',
+  border: `1px solid ${palette.border}`,
+  background: 'rgba(255,255,255,0.08)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+};
+
+const photoStyle = {
+  width: '100%',
+  height: '100%',
+  display: 'block',
+  objectFit: 'cover',
 };
 
 const members = [
   {
-    name: 'Maya R.',
+    name: 'Muhammad Zain Naveed',
     role: 'President · HESS',
-    program: 'CAS · Neural Science & Computer Science',
-    bio: 'Leads cross-campus partnerships and the HESSPLORE editorial team. Currently researching memory and perception.',
+    school: 'CAS | Tandon',
+    pronouns: 'he/him',
+    bio: 'Chairs the executive board, sets the society’s vision, and builds cross-campus partnerships to amplify NYU STEM.',
     focus: 'Strategy & Partnerships',
+    photo: '/members/President.png',
   },
   {
-    name: 'Elias T.',
-    role: 'Director of Technovation',
-    program: 'Tandon · Mechatronics & Robotics',
-    bio: 'Heads ScholarSync engineering and prototyping nights in the MakerSpace, helping teams bring hardware ideas to life.',
-    focus: 'Product & Maker Initiatives',
+    name: 'Shahriza Mashafi',
+    role: 'Vice President',
+    school: 'CAS · Executive Leadership',
+    pronouns: 'he/him',
+    bio: 'Operational lead, coordinating board initiatives, budgeting, and supporting each program track day-to-day.',
+    focus: 'Operations & Alignment',
+    photo: '/members/VicePresident.png',
   },
   {
-    name: 'Sahana K.',
-    role: 'Director of Storytelling',
-    program: 'Steinhardt · Media, Culture, and Communication',
-    bio: 'Translates complex research into digestible media, coaching student hosts and coordinating interview shoots.',
-    focus: 'HESSPLORE Media',
+    name: 'Elizabeth Kuznetsov',
+    role: 'Secretary',
+    school: 'NYU · Communications',
+    pronouns: 'they/them',
+    bio: 'Keeps HESS organized—meeting notes, board documentation, and communication pipelines across CAS ↔ Tandon.',
+    focus: 'Org Infrastructure',
+    photo: '/members/Secretary.png',
   },
   {
-    name: 'Jordan P.',
-    role: 'Community & Events Lead',
-    program: 'CAS · Physics',
-    bio: 'Designs mixer formats, manages the speaker series pipeline, and keeps the events calendar humming.',
-    focus: 'Events & Membership',
+    name: 'Shru Singh',
+    role: 'Assistant Secretary',
+    school: 'NYU · Communications',
+    pronouns: 'she/her',
+    bio: 'Supports outreach, archives content, and ensures project handoffs stay clear between media and engineering teams.',
+    focus: 'Content Ops',
+    photo: '/members/AssistantSecretary.png',
+  },
+  {
+    name: 'Ellie Chen',
+    role: 'Assistant Secretary',
+    school: 'NYU Tandon · Engineering',
+    pronouns: 'he/him',
+    bio: 'Anchors the Brooklyn campus presence, bridging MakerSpace projects with the downtown storytelling crew.',
+    focus: 'Tandon Liaison',
+    photo: '/members/AssistantSecretary1.png',
+  },
+  {
+    name: 'Shahzad Awan',
+    role: 'Treasurer',
+    school: 'CAS · Finance & Accounting',
+    pronouns: 'she/her',
+    bio: 'Manages the society’s budget, sponsorships, and resource allocations so every program has what it needs.',
+    focus: 'Finance & Sponsorship',
+    photo: '/members/Treasurer.png',
+  },
+  {
+    name: 'Aziz Ball',
+    role: 'Director General',
+    school: 'NYU · Programs',
+    pronouns: 'he/him',
+    bio: 'Leads major initiatives like ScholarSync Studio and HESSPLORE, guiding student teams from idea to delivery.',
+    focus: 'Program Direction',
+    photo: '/members/DirectorGeneral.png',
+  },
+  {
+    name: 'Giovanni Oliveta',
+    role: 'Director General',
+    school: 'NYU · Global Network',
+    pronouns: 'she/her',
+    bio: 'Extends HESS programming to NYU global campuses, coordinating research spotlights and alumni mentors abroad.',
+    focus: 'Global Programs',
+    photo: '/members/DirectorGeneral1.png',
   },
 ];
 
@@ -78,21 +144,36 @@ export default function OurTeam() {
         <section style={{ display: 'grid', gap: '28px', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}>
           {members.map((member) => (
             <article key={member.name} style={cardStyle}>
+              {member.photo && (
+                <figure style={photoWrapper}>
+                  <img
+                    src={member.photo}
+                    alt={`${member.name} portrait`}
+                    style={photoStyle}
+                  />
+                </figure>
+              )}
               <div>
                 <h2 style={{ ...heading, fontSize: '1.6rem', marginBottom: '4px' }}>{member.name}</h2>
                 <p style={{ ...paragraph, color: palette.muted, fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', fontSize: '0.85rem' }}>
                   {member.role}
                 </p>
               </div>
-              <p style={{ ...paragraph, color: palette.muted, marginBottom: '4px', fontSize: '0.95rem' }}>
-                🎓 {member.program}
-              </p>
-              <p style={{ ...paragraph, opacity: 0.92 }}>
-                {member.bio}
-              </p>
-              <p style={{ ...paragraph, color: palette.muted, fontStyle: 'italic', fontSize: '0.95rem' }}>
-                Focus: {member.focus}
-              </p>
+              {(member.school || member.pronouns) && (
+                <p style={{ ...paragraph, color: palette.muted, marginBottom: '4px', fontSize: '0.95rem' }}>
+                  🎓 {member.school} {member.pronouns ? `· ${member.pronouns}` : ''}
+                </p>
+              )}
+              {member.bio && (
+                <p style={{ ...paragraph, opacity: 0.92 }}>
+                  {member.bio}
+                </p>
+              )}
+              {member.focus && (
+                <p style={{ ...paragraph, color: palette.muted, fontStyle: 'italic', fontSize: '0.95rem' }}>
+                  Focus: {member.focus}
+                </p>
+              )}
             </article>
           ))}
         </section>

@@ -1,3 +1,25 @@
+/* Global lightweight resets */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Montserrat', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  background-color: #0F172A;
+  color: #E2E8F0;
+}
+
+a {
+  color: inherit;
+}
+
+button,
+input,
+textarea {
+  font-family: inherit;
+}
+
 :root { --purple: #57068c; --dark: #111; --light: #fff; --muted: #666; }
 * { box-sizing: border-box; }
 body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; color: var(--dark); }
