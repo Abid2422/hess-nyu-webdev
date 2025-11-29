@@ -9,6 +9,7 @@ import Programs from './pages/Programs.jsx';
 import Join from './pages/Join.jsx';
 import Contact from './pages/Contact.jsx';
 import Hessplore from './pages/Hessplore.jsx';
+import ScholarSync from './pages/ScholarSync.jsx';
 import AdminDashboard from './pages/AdminDashboard.jsx';
 import { useAuth } from './context/AuthContext.jsx';
 
@@ -37,6 +38,7 @@ export default function App() {
           <Route path="/join" element={<Join />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/hessplore" element={<Hessplore />} />
+          <Route path="/scholarsync" element={<ScholarSync />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

@@ -1,35 +1,6 @@
 import { useEffect, useState } from 'react';
 import { apiRequest } from '../api/client.js';
-
-const palette = {
-  background: '#0F172A',
-  surface: 'rgba(255,255,255,0.03)',
-  border: 'rgba(255,255,255,0.06)',
-  accent: '#6D28D9',
-  text: '#E2E8F0',
-  muted: '#94A3B8',
-};
-
-const heading = {
-  fontFamily: 'Montserrat, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-  fontWeight: 800,
-};
-
-const paragraph = {
-  fontFamily: 'Montserrat, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-  lineHeight: 1.6,
-  color: palette.text,
-};
-
-const cardStyle = {
-  backgroundColor: palette.surface,
-  border: `1px solid ${palette.border}`,
-  borderRadius: '20px',
-  padding: '32px',
-  boxShadow: '0 20px 45px rgba(10,14,23,0.45)',
-  display: 'grid',
-  gap: '16px',
-};
+import '../styles/PageLayout.css';
 
 export default function Programs() {
   const [programs, setPrograms] = useState([]);
@@ -63,64 +34,51 @@ export default function Programs() {
   }, []);
 
   return (
-    <div style={{ backgroundColor: palette.background, color: palette.text, minHeight: '100vh', padding: '96px 0 104px' }}>
-      <div style={{ maxWidth: '1080px', margin: '0 auto', padding: '0 24px', display: 'grid', gap: '48px' }}>
-        <header style={{ textAlign: 'center', display: 'grid', gap: '18px' }}>
-          <span style={{ ...paragraph, color: palette.muted, letterSpacing: '0.08em', textTransform: 'uppercase', fontSize: '0.82rem' }}>
-            HESS Programs · 2024–2025
-          </span>
-          <h1 style={{ ...heading, fontSize: 'clamp(2.4rem, 4.8vw, 3.6rem)' }}>
-            Where HESS members build skills, stories, and community
-          </h1>
-          <p style={{ ...paragraph, color: palette.muted, maxWidth: '760px', margin: '0 auto' }}>
-            Whether you’re prototyping hardware, translating research, or meeting mentors, there’s a track that keeps you connected to the people and labs shaping NYU STEM.
-          </p>
+    <div className="page page--programs">
+      <div className="page-content">
+        <header className="page-header">
+          <h1>Explore HESS Programs</h1>
+          <p>Hands-on labs, storytelling studios, and mentorship tracks that connect NYU&apos;s engineering and science communities.</p>
         </header>
 
-        {loading ? (
-          <p style={{ ...paragraph, color: palette.muted, textAlign: 'center' }}>Loading programs…</p>
-        ) : error ? (
-          <p style={{ ...paragraph, color: '#fca5a5', textAlign: 'center' }}>{error}</p>
-        ) : (
-          <section style={{ display: 'grid', gap: '28px', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
-            {programs.map((program) => (
-              <article key={program._id} style={cardStyle}>
-                <div>
-                  <h2 style={{ ...heading, fontSize: '1.8rem', marginBottom: '6px' }}>{program.title}</h2>
-                  {program.shortDescription && (
-                    <p style={{ ...paragraph, color: palette.muted, fontStyle: 'italic' }}>{program.shortDescription}</p>
-                  )}
-                </div>
-                {program.longDescription && (
-                  <p style={{ ...paragraph, opacity: 0.92 }}>
-                    {program.longDescription}
-                  </p>
-                )}
-                {program.meetingFrequency && (
-                  <p style={{ ...paragraph, color: palette.muted, fontSize: '0.95rem' }}>
-                    📅 {program.meetingFrequency}
-                  </p>
-                )}
-                {program.ctaLabel && program.ctaUrl && (
-                  <a href={program.ctaUrl} style={{ ...paragraph, color: palette.accent, fontWeight: 600 }}>
-                    {program.ctaLabel}
-                  </a>
-                )}
-              </article>
-            ))}
-            {programs.length === 0 && (
-              <p style={{ gridColumn: '1/-1', ...paragraph, color: palette.muted, textAlign: 'center' }}>
-                Sit tight—fresh programs are being finalized and will appear here soon.
-              </p>
-            )}
-          </section>
-        )}
+        <section className="glass-section">
+          <h2 className="section-title">Programs & initiatives</h2>
+          {loading && <p className="page-note">Loading programs…</p>}
+          {error && <p className="page-note" style={{ color: '#fca5a5' }}>{error}</p>}
 
-        <footer style={{ textAlign: 'center', display: 'grid', gap: '10px' }}>
-          <p style={{ ...paragraph, color: palette.muted }}>
-            Curious where you fit? Email <a href="mailto:nyuhemmes@gmail.com" style={{ color: palette.text, textDecoration: 'underline', fontWeight: 600 }}>nyuhemmes@gmail.com</a> and we’ll match you with the right track.
+          {!loading && !error && (
+            <div className="card-grid">
+              {programs.map((program) => (
+                <article key={program._id} className="glass-card glass-card--hoverable">
+                  <h3>{program.title}</h3>
+                  {program.shortDescription && <h4>{program.shortDescription}</h4>}
+                  {program.longDescription && <p>{program.longDescription}</p>}
+                  {program.meetingFrequency && (
+                    <p style={{ color: '#bfdbfe' }}>📅 {program.meetingFrequency}</p>
+                  )}
+                  {program.ctaLabel && program.ctaUrl && (
+                    <a className="ghost-link" href={program.ctaUrl} target="_blank" rel="noreferrer">
+                      {program.ctaLabel} →
+                    </a>
+                  )}
+                </article>
+              ))}
+            </div>
+          )}
+
+          {!loading && !error && programs.length === 0 && (
+            <p className="page-note" style={{ marginTop: '8px' }}>
+              Sit tight—fresh programs are being finalized and will appear here soon.
+            </p>
+          )}
+        </section>
+
+        <section className="glass-section">
+          <h2 className="section-title">Have an idea?</h2>
+          <p className="section-description">
+            Curious where you fit? Email <a className="ghost-link" href="mailto:nyuhemmes@gmail.com">nyuhemmes@gmail.com</a> and we’ll match you with the right track or help you launch the next one.
           </p>
-        </footer>
+        </section>
       </div>
     </div>
   );

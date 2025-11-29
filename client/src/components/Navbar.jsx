@@ -62,6 +62,7 @@ export function Navbar() {
           <NavLink to="/join" style={linkStyle}>Join</NavLink>
           <NavLink to="/contact" style={linkStyle}>Contact</NavLink>
           <NavLink to="/hessplore" style={linkStyle}>HESSPLORE</NavLink>
+          <NavLink to="/scholarsync" style={linkStyle}>ScholarSync</NavLink>
         </nav>
       </div>
     </header>

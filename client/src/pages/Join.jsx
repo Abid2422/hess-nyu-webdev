@@ -1,22 +1,4 @@
-const palette = {
-  background: '#0F172A',
-  surface: 'rgba(255,255,255,0.03)',
-  border: 'rgba(255,255,255,0.06)',
-  accent: '#6D28D9',
-  text: '#E2E8F0',
-  muted: '#94A3B8',
-};
-
-const heading = {
-  fontFamily: 'Montserrat, system-ui, -apple-system, "Segoe UI", sans-serif',
-  fontWeight: 800,
-};
-
-const paragraph = {
-  fontFamily: heading.fontFamily,
-  color: palette.text,
-  lineHeight: 1.6,
-};
+import '../styles/PageLayout.css';
 
 const teams = [
   {
@@ -55,43 +37,29 @@ const teams = [
 
 export default function Join() {
   return (
-    <div style={{ backgroundColor: palette.background, color: palette.text, minHeight: '100vh', padding: '96px 0 104px' }}>
-      <div style={{ maxWidth: '960px', margin: '0 auto', padding: '0 24px', display: 'grid', gap: '32px' }}>
-        <header style={{ textAlign: 'center', display: 'grid', gap: '12px' }}>
-          <h1 style={{ ...heading, fontSize: 'clamp(2.2rem, 5vw, 3.2rem)' }}>Join the HESS teams</h1>
-          <p style={{ ...paragraph, color: palette.muted, maxWidth: '720px', margin: '0 auto' }}>
-            We’re kicking off recruitment for specialized crews that keep HESS running. Each team focuses on a different part of our mission—choose where you want to build impact.
-          </p>
+    <div className="page page--join">
+      <div className="page-content">
+        <header className="page-header">
+          <h1>Join the HESS teams</h1>
+          <p>We’re opening roles across our storytelling, engineering, and community crews. Explore the tracks below—applications launch soon.</p>
         </header>
 
-        <section style={{ display: 'grid', gap: '20px', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}>
+        <section className="card-grid">
           {teams.map((team) => (
-            <article
-              key={team.name}
-              style={{
-                backgroundColor: palette.surface,
-                border: `1px solid ${palette.border}`,
-                borderRadius: '20px',
-                padding: '24px',
-                boxShadow: '0 24px 48px rgba(9,13,22,0.45)',
-                display: 'grid',
-                gap: '10px',
-              }}
-            >
-              <h2 style={{ ...heading, fontSize: '1.4rem' }}>{team.name}</h2>
-              <p style={{ ...paragraph, color: palette.muted }}>{team.description}</p>
+            <article key={team.name} className="glass-card glass-card--hoverable">
+              <h3>{team.name}</h3>
+              <p>{team.description}</p>
             </article>
           ))}
         </section>
 
-        <footer style={{ textAlign: 'center' }}>
-          <p style={{ ...paragraph, color: palette.muted }}>
-            More details about joining and applications will be released soon. In the meantime, questions are always welcome at{' '}
-            <a href="mailto:nyuhemmes@gmail.com" style={{ color: palette.accent, textDecoration: 'underline', fontWeight: 600 }}>
-              nyuhemmes@gmail.com
-            </a>.
+        <section className="glass-section" style={{ textAlign: 'center' }}>
+          <h2 className="section-title">Next steps</h2>
+          <p className="section-description">
+            More information about joining and applications will be available soon. In the meantime, questions are always welcome at{' '}
+            <a className="ghost-link" href="mailto:nyuhemmes@gmail.com">nyuhemmes@gmail.com</a>.
           </p>
-        </footer>
+        </section>
       </div>
     </div>
   );
