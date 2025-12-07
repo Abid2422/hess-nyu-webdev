@@ -29,7 +29,7 @@ export default function Contact() {
               New York, NY 10012
             </p>
           </article>
-        </section>
+    </section>
       </div>
     </div>
   );

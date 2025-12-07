@@ -59,7 +59,7 @@ export default function Join() {
             More information about joining and applications will be available soon. In the meantime, questions are always welcome at{' '}
             <a className="ghost-link" href="mailto:nyuhemmes@gmail.com">nyuhemmes@gmail.com</a>.
           </p>
-        </section>
+    </section>
       </div>
     </div>
   );

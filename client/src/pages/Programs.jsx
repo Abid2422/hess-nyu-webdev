@@ -78,7 +78,7 @@ export default function Programs() {
           <p className="section-description">
             Curious where you fit? Email <a className="ghost-link" href="mailto:nyuhemmes@gmail.com">nyuhemmes@gmail.com</a> and we’ll match you with the right track or help you launch the next one.
           </p>
-        </section>
+    </section>
       </div>
     </div>
   );
